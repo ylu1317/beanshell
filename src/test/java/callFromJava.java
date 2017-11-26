@@ -2,7 +2,7 @@ import bsh.*;
 
 public class callFromJava { 
 
-	public static void main( String argv[] ) throws EvalError {
+	public static void main( String argv[] ) throws EvalError, AbortException {
 
 		Interpreter interpreter = new Interpreter();
 		interpreter.set("foo", 5);

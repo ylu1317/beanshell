@@ -36,8 +36,8 @@ public class BSHPackageDeclaration extends SimpleNode
   }
 
 	public Object eval( CallStack callstack, Interpreter interpreter )
-		throws EvalError
-	{
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		BSHAmbiguousName name = (BSHAmbiguousName)jjtGetChild(0);
 		NameSpace namespace = callstack.top();
 		namespace.setPackage( name.text );

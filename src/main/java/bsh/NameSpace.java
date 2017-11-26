@@ -227,9 +227,8 @@ public class NameSpace
 	/**
 		Resolve name to an object through this namespace.
 	*/
-	public Object get( String name, Interpreter interpreter ) 
-		throws UtilEvalError 
-	{
+	public Object get( String name, Interpreter interpreter )
+		throws UtilEvalError, AbortException {
 		CallStack callstack = new CallStack( this );
 		return getNameResolver( name ).toObject( callstack, interpreter );
 	}
@@ -249,9 +248,8 @@ public class NameSpace
 
 		@param strictJava specifies whether strict java rules are applied.
 	*/
-    public void	setVariable( String name, Object value, boolean strictJava ) 
-		throws UtilEvalError 
-	{
+    public void	setVariable( String name, Object value, boolean strictJava )
+		throws UtilEvalError, AbortException {
 		// if localscoping switch follow strictJava, else recurse
 		boolean recurse = Interpreter.LOCALSCOPING ? strictJava : true;
 		setVariable( name, value, strictJava, recurse );
@@ -262,8 +260,7 @@ public class NameSpace
 	*/
 	public Variable setLocalVariable(
 		String name, Object value, boolean strictJava )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		return setVariable( name, value, strictJava, false/*recurse*/ );
 	}
 	
@@ -292,8 +289,7 @@ public class NameSpace
 	*/
 	Variable setVariable(
 		String name, Object value, boolean strictJava, boolean recurse )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		if ( variables == null )
 			variables =	new Hashtable();
 
@@ -355,9 +351,8 @@ public class NameSpace
 	
 		@param strictJava specifies whether strict java rules are applied.
 	*/
-	public void	setVariableOrProperty( String name, Object value, boolean strictJava ) 
-		throws UtilEvalError 
-	{
+	public void	setVariableOrProperty( String name, Object value, boolean strictJava )
+		throws UtilEvalError, AbortException {
 		// if localscoping switch follow strictJava, else recurse
 		boolean recurse = Interpreter.LOCALSCOPING ? strictJava : true;
 		setVariableOrProperty( name, value, strictJava, recurse );
@@ -381,9 +376,8 @@ public class NameSpace
 		</p>		
 	*/
 	void setLocalVariableOrProperty( 
-		String name, Object value, boolean strictJava ) 
-		throws UtilEvalError 
-	{
+		String name, Object value, boolean strictJava )
+		throws UtilEvalError, AbortException {
 		setVariableOrProperty( name, value, strictJava, false/*recurse*/ );
 	}
 	
@@ -410,9 +404,8 @@ public class NameSpace
 		  our parent's scope before assigning locally.
 	*/
 	void setVariableOrProperty( 
-		String name, Object value, boolean strictJava, boolean recurse ) 
-		throws UtilEvalError 
-	{
+		String name, Object value, boolean strictJava, boolean recurse )
+		throws UtilEvalError, AbortException {
 		if ( variables == null )
 			variables =	new Hashtable();
 
@@ -460,15 +453,13 @@ public class NameSpace
 
 	protected Variable createVariable(
 		String name, Object value, Modifiers mods )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		return createVariable( name, null/*type*/, value, mods );
 	}
 
 	protected Variable createVariable(
 		String name, Class type, Object value, Modifiers mods )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		return new Variable( name, type, value, mods );
 	}
 
@@ -629,8 +620,7 @@ public class NameSpace
 		return thisReference;
     }
 
-	public BshClassManager getClassManager() 
-	{
+	public BshClassManager getClassManager() throws AbortException {
 		if ( classManager != null )
 			return classManager;
 		if ( parent != null && parent != JAVACODE )
@@ -650,8 +640,7 @@ public class NameSpace
 	/**
 		Used for serialization
 	*/
-	public void prune() 
-	{
+	public void prune() throws AbortException {
 		// Cut off from parent, we must have our own class manager.
 		// Can't do this in the run() command (needs to resolve stuff)
 		// Should we do it by default when we create a namespace will no
@@ -688,9 +677,8 @@ public class NameSpace
 		@return The variable or property value or Primitive.VOID if neither is
 			defined.
 	*/
-	public Object getVariableOrProperty( String name, Interpreter interp ) 
-		throws UtilEvalError
-	{
+	public Object getVariableOrProperty( String name, Interpreter interp )
+		throws UtilEvalError, AbortException {
 		Object val = getVariable( name, true );
 		return (val==Primitive.VOID) ? getPropertyValue(name, interp) : val;
 	}		
@@ -705,9 +693,8 @@ public class NameSpace
 
 		@return The variable value or Primitive.VOID if it is not defined.
 	*/
-    public Object getVariable( String name ) 
-		throws UtilEvalError
-	{
+    public Object getVariable( String name )
+		throws UtilEvalError, AbortException {
 		return getVariable( name, true );
 	}
 
@@ -723,9 +710,8 @@ public class NameSpace
 
 		@return The variable value or Primitive.VOID if it is not defined.
 	*/
-    public Object getVariable( String name, boolean recurse ) 
-		throws UtilEvalError
-	{
+    public Object getVariable( String name, boolean recurse )
+		throws UtilEvalError, AbortException {
 		Variable var = getVariableImpl( name, recurse );
 		return unwrapVariable( var );
     }
@@ -738,9 +724,8 @@ public class NameSpace
 
 		@return the Variable value or null if it is not defined
 	*/
-    protected Variable getVariableImpl( String name, boolean recurse ) 
-		throws UtilEvalError
-	{
+    protected Variable getVariableImpl( String name, boolean recurse )
+		throws UtilEvalError, AbortException {
 		Variable var = null;
 
 		// Change import precedence if we are a class body/instance
@@ -781,9 +766,8 @@ public class NameSpace
 		@return return the variable value.  A null var is mapped to 
 			Primitive.VOID
 	*/
-	protected Object unwrapVariable( Variable var ) 
-		throws UtilEvalError
-	{
+	protected Object unwrapVariable( Variable var )
+		throws UtilEvalError, AbortException {
 		return (var == null) ? Primitive.VOID :	var.getValue();
 	}
 
@@ -792,8 +776,7 @@ public class NameSpace
 	*/
     public void	setTypedVariable(
 		String	name, Class type, Object value,	boolean	isFinal )
-		throws UtilEvalError 
-	{
+		throws UtilEvalError, AbortException {
 		Modifiers modifiers = new Modifiers();
 		if ( isFinal )
 			modifiers.addModifier( Modifiers.FIELD, "final" );
@@ -821,8 +804,7 @@ public class NameSpace
     */
     public void	setTypedVariable(
 		String	name, Class type, Object value,	Modifiers modifiers )
-		throws UtilEvalError 
-	{
+		throws UtilEvalError, AbortException {
 		//checkVariableModifiers( name, modifiers );
 
 		if ( variables == null )
@@ -906,9 +888,8 @@ public class NameSpace
 		@see #getMethod( String, Class [], boolean )
 		@see #getMethod( String, Class [] )
 	*/
-    public BshMethod getMethod( String name, Class [] sig ) 
-		throws UtilEvalError
-	{
+    public BshMethod getMethod( String name, Class [] sig )
+		throws UtilEvalError, AbortException {
 		return getMethod( name, sig, false/*declaredOnly*/ );
 	}
 
@@ -926,9 +907,8 @@ public class NameSpace
 			be visible.
 	*/
     public BshMethod getMethod( 
-		String name, Class [] sig, boolean declaredOnly ) 
-		throws UtilEvalError
-	{
+		String name, Class [] sig, boolean declaredOnly )
+		throws UtilEvalError, AbortException {
 		BshMethod method = null;
 
 		// Change import precedence if we are a class body/instance
@@ -1062,9 +1042,8 @@ public class NameSpace
 			i.e. on errors loading a script that was found
 	*/
 	public Object getCommand( 	
-		String name, Class [] argTypes, Interpreter interpreter ) 
-		throws UtilEvalError
-	{
+		String name, Class [] argTypes, Interpreter interpreter )
+		throws UtilEvalError, AbortException {
 		if (Interpreter.DEBUG) Interpreter.debug("getCommand: "+name);
 		BshClassManager bcm = interpreter.getClassManager();
 
@@ -1109,9 +1088,8 @@ public class NameSpace
 			return null;
 	}
 
-	protected BshMethod getImportedMethod( String name, Class [] sig ) 
-		throws UtilEvalError
-	{
+	protected BshMethod getImportedMethod( String name, Class [] sig )
+		throws UtilEvalError, AbortException {
 		// Try object imports
 		if ( importedObjects != null )
 		for(int i=0; i<importedObjects.size(); i++)
@@ -1181,8 +1159,7 @@ public class NameSpace
 	private BshMethod loadScriptedCommand( 
 		InputStream in, String name, Class [] argTypes, String resourcePath, 
 		Interpreter interpreter )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		try {
 			interpreter.eval( 
 				new InputStreamReader(in), this, resourcePath );
@@ -1228,8 +1205,7 @@ public class NameSpace
 		@return null if not found.
 	*/
     public Class getClass( String name )
-		throws UtilEvalError
-    {
+		throws UtilEvalError, AbortException {
 		Class c = getClassImpl(name);
 		if ( c != null )
 			return c;
@@ -1259,8 +1235,7 @@ public class NameSpace
 		@return null if not found.
 	*/
     private Class getClassImpl( String name )
-		throws UtilEvalError
-    {
+		throws UtilEvalError, AbortException {
 		Class c = null;
 
 		// Check the cache
@@ -1309,8 +1284,7 @@ public class NameSpace
 		found directly in this NameSpace (no parent chain).
 	*/
     private Class getImportedClassImpl( String name )
-		throws UtilEvalError
-    {
+		throws UtilEvalError, AbortException {
 		// Try explicitly imported class, e.g. import foo.Bar;
 		String fullname = null;
 		if ( importedClasses != null )
@@ -1387,8 +1361,7 @@ public class NameSpace
 		return null;
     }
 
-	private Class classForName( String name ) 
-	{
+	private Class classForName( String name ) throws AbortException {
 		return getClassManager().classForName( name );
 	}
 
@@ -1438,9 +1411,8 @@ public class NameSpace
 		Perform "import *;" causing the entire classpath to be mapped.
 		This can take a while.
 	*/
-	public void doSuperImport() 
-		throws UtilEvalError
-	{
+	public void doSuperImport()
+		throws UtilEvalError, AbortException {
 		getClassManager().doSuperImport();
 	}
 
@@ -1480,9 +1452,8 @@ public class NameSpace
 			CallStack callstack, SimpleNode callerInfo, boolean )
 	*/
 	public Object invokeMethod( 
-		String methodName, Object [] args, Interpreter interpreter ) 
-		throws EvalError
-	{
+		String methodName, Object [] args, Interpreter interpreter )
+		throws EvalError, AbortException {
 		return invokeMethod( 
 			methodName, args, interpreter, null, null );
 	}
@@ -1496,9 +1467,8 @@ public class NameSpace
 	*/
 	public Object invokeMethod( 
 		String methodName, Object [] args, Interpreter interpreter, 
-		CallStack callstack, SimpleNode callerInfo ) 
-		throws EvalError
-	{
+		CallStack callstack, SimpleNode callerInfo )
+		throws EvalError, AbortException {
 		return getThis( interpreter ).invokeMethod( 
 			methodName, args, interpreter, callstack, callerInfo,
 			false/*declaredOnly*/ );
@@ -1708,7 +1678,7 @@ public class NameSpace
      */
     boolean attemptSetPropertyValue(String propName,
     		Object value, Interpreter interp)
-    	throws UtilEvalError {
+		throws UtilEvalError, AbortException {
     	
     	String accessorName = Reflect.accessorName( "set", propName );
     	
@@ -1739,7 +1709,7 @@ public class NameSpace
      * @throws UtilEvalError 
      */
     Object getPropertyValue(String propName, Interpreter interp)
-    	throws UtilEvalError {
+		throws UtilEvalError, AbortException {
     	
     	String accessorName = Reflect.accessorName( "get", propName );
     	Class[] classArray = new Class[0];

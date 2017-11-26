@@ -56,7 +56,7 @@ public abstract class ClassGenerator
 		Class [] interfaces, Class superClass, BSHBlock block, 
 		boolean isInterface, CallStack callstack, Interpreter interpreter 
 	)
-		throws EvalError;
+        throws EvalError, AbortException;
 
 	/**
 		Invoke a super.method() style superclass method on an object instance.

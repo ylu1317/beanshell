@@ -43,8 +43,8 @@ class BSHCastExpression extends SimpleNode {
 		@return the result of the cast.
 	*/
 	public Object eval(
-		CallStack callstack, Interpreter interpreter ) throws EvalError
-    {
+		CallStack callstack, Interpreter interpreter ) throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		NameSpace namespace = callstack.top();
         Class toType = ((BSHType)jjtGetChild(0)).getType( 
 			callstack, interpreter );

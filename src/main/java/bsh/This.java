@@ -148,6 +148,9 @@ public class This implements java.io.Serializable, Runnable
 		} catch( EvalError e ) {
 			declaringInterpreter.error(
 				"Exception in runnable:" + e );
+		} catch (AbortException e) {
+		    System.out.println("Aborting...");
+			// e.printStackTrace();
 		}
 	}
 
@@ -160,9 +163,8 @@ public class This implements java.io.Serializable, Runnable
 		Primitive/Primitive.unwrap() for use outside of BeanShell.
 		@see bsh.Primitive
 	*/
-	public Object invokeMethod( String name, Object [] args ) 
-		throws EvalError
-	{
+	public Object invokeMethod( String name, Object [] args )
+		throws EvalError, AbortException {
 		// null callstack, one will be created for us 
 		return invokeMethod( 
 			name, args, null/*declaringInterpreter*/, null, null, 
@@ -208,9 +210,8 @@ public class This implements java.io.Serializable, Runnable
 	public Object invokeMethod( 
 		String methodName, Object [] args, 
 		Interpreter interpreter, CallStack callstack, SimpleNode callerInfo, 
-		boolean declaredOnly  ) 
-		throws EvalError
-	{
+		boolean declaredOnly  )
+		throws EvalError, AbortException {
 		/*
 			Wrap nulls.
 			This is a bit of a cludge to address a deficiency in the class

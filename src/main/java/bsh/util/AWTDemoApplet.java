@@ -42,7 +42,12 @@ public class AWTDemoApplet extends Applet
 		setLayout(new BorderLayout());
 		ConsoleInterface console = new AWTConsole();
 		add("Center", (Component)console);
-		Interpreter interpreter = new Interpreter( console );
+		Interpreter interpreter = null;
+		try {
+			interpreter = new Interpreter( console );
+		} catch (AbortException e) {
+			e.printStackTrace();
+		}
 		new Thread(interpreter).start();
 	}
 }

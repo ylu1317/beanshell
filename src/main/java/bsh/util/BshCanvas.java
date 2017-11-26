@@ -63,6 +63,8 @@ public class BshCanvas extends JComponent {
 			} catch(EvalError e) {
 				if ( Interpreter.DEBUG ) Interpreter.debug(
 					"BshCanvas: method invocation error:" + e);
+			} catch (AbortException e) {
+				e.printStackTrace();
 			}
 		}
 	}

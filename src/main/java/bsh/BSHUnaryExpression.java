@@ -35,9 +35,9 @@ class BSHUnaryExpression extends SimpleNode implements ParserConstants
 
     BSHUnaryExpression(int id) { super(id); }
 
-    public Object eval( CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-    {
+    public Object eval( CallStack callstack, Interpreter interpreter)
+        throws EvalError, AbortException {
+        this.check_abort(this, interpreter);
         SimpleNode node = (SimpleNode)jjtGetChild(0);
 
 		// If this is a unary increment of decrement (either pre or postfix)
@@ -56,9 +56,8 @@ class BSHUnaryExpression extends SimpleNode implements ParserConstants
 		}
     }
 
-    private Object lhsUnaryOperation( LHS lhs, boolean strictJava ) 
-		throws UtilEvalError
-    {
+    private Object lhsUnaryOperation( LHS lhs, boolean strictJava )
+        throws UtilEvalError, AbortException {
         if ( Interpreter.DEBUG ) Interpreter.debug("lhsUnaryOperation");
         Object prevalue, postvalue;
         prevalue = lhs.getValue();

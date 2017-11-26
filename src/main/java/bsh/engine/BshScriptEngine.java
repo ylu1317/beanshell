@@ -3,6 +3,8 @@ package bsh.engine;
 import java.io.*;
 import java.util.Map;
 import javax.script.*;
+import javax.swing.*;
+
 import bsh.*;
 import static javax.script.ScriptContext.*;
 
@@ -20,18 +22,16 @@ public class BshScriptEngine extends AbstractScriptEngine
 	private BshScriptEngineFactory factory;
 	private bsh.Interpreter interpreter;
 
-	public BshScriptEngine() {
+	public BshScriptEngine() throws AbortException {
 		this( null );
 	}
 
-	public BshScriptEngine( BshScriptEngineFactory factory ) 
-	{
+	public BshScriptEngine( BshScriptEngineFactory factory ) throws AbortException {
 		this.factory = factory;
 		getInterpreter(); // go ahead and prime the interpreter now
 	}
 
-	protected Interpreter getInterpreter()
-	{
+	protected Interpreter getInterpreter() throws AbortException {
 		if ( interpreter == null ) {
 			this.interpreter = new bsh.Interpreter();
 			interpreter.setNameSpace(null); // should always be set by context
@@ -43,14 +43,22 @@ public class BshScriptEngine extends AbstractScriptEngine
 	public Object eval( String script, ScriptContext scriptContext )
 		throws ScriptException
 	{
-		return evalSource( script, scriptContext );
+		try {
+			return evalSource( script, scriptContext );
+		} catch (AbortException e) {
+		    throw new ScriptException("Abort Exception: " + e.toString());
+		}
 	}
 
 	public Object eval( Reader reader, ScriptContext scriptContext )
 		throws ScriptException
 	{
-		return evalSource( reader, scriptContext );
-	}
+        try {
+            return evalSource( reader, scriptContext );
+        } catch (AbortException e) {
+            throw new ScriptException("Abort Exception: " + e.toString());
+        }
+    }
 
 	/*
 		This is the primary implementation method.
@@ -59,8 +67,7 @@ public class BshScriptEngine extends AbstractScriptEngine
 		tack on a trailing ";" semicolon if necessary.
 	*/
 	private Object evalSource( Object source, ScriptContext scriptContext )
-		throws ScriptException
-	{
+		throws ScriptException, AbortException {
 		bsh.NameSpace contextNameSpace = getEngineNameSpace( scriptContext );
 		Interpreter bsh = getInterpreter();
 		bsh.setNameSpace( contextNameSpace );
@@ -226,8 +233,10 @@ public class BshScriptEngine extends AbstractScriptEngine
 		} catch ( InterpreterError e ) {
 			// The interpreter had a fatal problem
 			throw new ScriptException( e.toString() );
-		}
-	}
+		} catch (AbortException e) {
+            throw new ScriptException("Abort exception: " + e.toString());
+        }
+    }
 
 	/**
 	 * Same as invoke(Object, String, Object...) with <code>null</code> as the
@@ -246,8 +255,12 @@ public class BshScriptEngine extends AbstractScriptEngine
 	public Object invokeFunction( String name, Object... args )
 		throws ScriptException, NoSuchMethodException
 	{
-		return invokeMethod( getGlobal(), name, args );
-	}
+        try {
+            return invokeMethod( getGlobal(), name, args );
+        } catch (AbortException e) {
+            throw new ScriptException("Abort Exception: " + e.toString());
+        }
+    }
 
     /**
 	 * Returns an implementation of an interface using procedures compiled in the
@@ -271,8 +284,11 @@ public class BshScriptEngine extends AbstractScriptEngine
 		} catch ( UtilEvalError utilEvalError ) {
 			utilEvalError.printStackTrace();
 			return null;
-		}
-	}
+		} catch (AbortException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 	/**
 	 * Returns an implementation of an interface using member functions of a
@@ -307,8 +323,7 @@ public class BshScriptEngine extends AbstractScriptEngine
 		}
 	}
 
-	private bsh.This getGlobal()
-	{
+	private bsh.This getGlobal() throws AbortException {
 		// requires 2.0b5 to make getThis() public
 		return getEngineNameSpace( getContext() ).getThis( getInterpreter() );
 	}

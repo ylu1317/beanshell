@@ -35,9 +35,9 @@ class BSHBlock extends SimpleNode
 
 	BSHBlock(int id) { super(id); }
 
-	public Object eval( CallStack callstack, Interpreter interpreter) 
-		throws EvalError
-	{
+	public Object eval( CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		return eval( callstack, interpreter, false );
 	}
 
@@ -53,9 +53,9 @@ class BSHBlock extends SimpleNode
 	*/
 	public Object eval( 
 		CallStack callstack, Interpreter interpreter, 
-		boolean overrideNamespace ) 
-		throws EvalError
-	{
+		boolean overrideNamespace )
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		Object syncValue = null;
 		if ( isSynchronized ) 
 		{
@@ -80,9 +80,9 @@ class BSHBlock extends SimpleNode
 
 	Object evalBlock( 
 		CallStack callstack, Interpreter interpreter, 
-		boolean overrideNamespace, NodeFilter nodeFilter ) 
-		throws EvalError
-	{	
+		boolean overrideNamespace, NodeFilter nodeFilter )
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		Object ret = Primitive.VOID;
 		NameSpace enclosingNameSpace = null;
 		if ( !overrideNamespace ) 

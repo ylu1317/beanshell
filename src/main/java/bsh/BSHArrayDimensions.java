@@ -52,9 +52,8 @@ class BSHArrayDimensions extends SimpleNode
     public void addUndefinedDimension() { numUndefinedDims++; }
 
     public Object eval( 
-			Class type, CallStack callstack, Interpreter interpreter ) 
-		throws EvalError 
-	{
+			Class type, CallStack callstack, Interpreter interpreter )
+        throws EvalError, AbortException {
 		if ( Interpreter.DEBUG ) Interpreter.debug("array base type = "+type);
 		baseType = type;
 		return eval( callstack, interpreter );
@@ -72,9 +71,9 @@ class BSHArrayDimensions extends SimpleNode
 
 		The structure of the array dims is maintained in dimensions.
 	*/
-    public Object eval( CallStack callstack, Interpreter interpreter )  
-		throws EvalError
-    {
+    public Object eval( CallStack callstack, Interpreter interpreter )
+		throws EvalError, AbortException {
+        this.check_abort(this, interpreter);
 		SimpleNode child = (SimpleNode)jjtGetChild(0);
 
 		/*

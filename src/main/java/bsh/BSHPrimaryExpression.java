@@ -35,18 +35,18 @@ class BSHPrimaryExpression extends SimpleNode
 	/**
 		Evaluate to a value object.
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-	{
+	public Object eval( CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		return eval( false, callstack, interpreter );
 	}
 
 	/**
 		Evaluate to a value object.
 	*/
-	public LHS toLHS( CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-	{
+	public LHS toLHS( CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		Object obj = eval( true, callstack, interpreter );
 
 		if ( ! (obj instanceof LHS) )
@@ -64,9 +64,9 @@ class BSHPrimaryExpression extends SimpleNode
 		how to interpret an ambiguous name (e.g. for the .class operation).
 	*/
 	private Object eval( boolean toLHS, 
-		CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-	{
+		CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		Object obj = jjtGetChild(0);
 		int numChildren = jjtGetNumChildren(); 
 

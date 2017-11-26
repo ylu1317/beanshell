@@ -44,8 +44,7 @@ public class ClassGeneratorImpl extends ClassGenerator
 		Class [] interfaces, Class superClass, BSHBlock block, 
 		boolean isInterface, CallStack callstack, Interpreter interpreter 
 	)
-		throws EvalError
-	{
+		throws EvalError, AbortException {
 		// Delegate to the static method
 		return generateClassImpl( name, modifiers, interfaces, superClass,
 			block, isInterface, callstack, interpreter );
@@ -85,8 +84,7 @@ public class ClassGeneratorImpl extends ClassGenerator
 		Class [] interfaces, Class superClass, BSHBlock block, 
 		boolean isInterface, CallStack callstack, Interpreter interpreter 
 	)
-		throws EvalError
-	{
+		throws EvalError, AbortException {
 		// Scripting classes currently requires accessibility
 		// This can be eliminated with a bit more work.
 		try {
@@ -218,8 +216,7 @@ public class ClassGeneratorImpl extends ClassGenerator
 	static Variable [] getDeclaredVariables( 
 		BSHBlock body, CallStack callstack, Interpreter interpreter, 
 		String defaultPackage 
-	) 
-	{
+	) throws AbortException {
 		List vars = new ArrayList();
 		for( int child=0; child<body.jjtGetNumChildren(); child++ )
 		{
@@ -254,8 +251,7 @@ public class ClassGeneratorImpl extends ClassGenerator
 	static DelayedEvalBshMethod [] getDeclaredMethods( 
 		BSHBlock body, CallStack callstack, Interpreter interpreter,
 		String defaultPackage 
-	)
-	{
+	) throws AbortException {
 		List methods = new ArrayList();
 		for( int child=0; child<body.jjtGetNumChildren(); child++ )
 		{

@@ -72,6 +72,8 @@ public class InterpreterConcurrencyTest {
                     Assert.assertEquals(value, callable.invokeMethod("call", new Object[]{value}));
                 } catch (final EvalError evalError) {
                     throw new RuntimeException(evalError);
+                } catch (AbortException e) {
+                    throw new RuntimeException(e.message);
                 }
             }
         };
@@ -91,6 +93,8 @@ public class InterpreterConcurrencyTest {
                     Assert.assertEquals(i, o);
                 } catch (final EvalError evalError) {
                     throw new RuntimeException(evalError);
+                } catch (AbortException e) {
+                    throw new RuntimeException(e.message);
                 }
             }
         };
@@ -98,7 +102,7 @@ public class InterpreterConcurrencyTest {
     }
 
 
-    private This createCallable() throws EvalError {
+    private This createCallable() throws EvalError, AbortException {
         final Interpreter interpreter = new Interpreter();
         return (This) interpreter.eval(script);
     }

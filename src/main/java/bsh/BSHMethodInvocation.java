@@ -47,8 +47,8 @@ class BSHMethodInvocation extends SimpleNode
 		interpreter
 	*/
 	public Object eval( CallStack callstack, Interpreter interpreter )
-		throws EvalError
-	{
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		NameSpace namespace = callstack.top();
 		BSHAmbiguousName nameNode = getNameNode();
 

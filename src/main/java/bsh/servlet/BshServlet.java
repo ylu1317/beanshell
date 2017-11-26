@@ -40,8 +40,7 @@ public class BshServlet extends HttpServlet
 	static String bshVersion;
 	static String exampleScript = "print(\"hello!\");";
 
-	static String getBshVersion() 
-	{
+	static String getBshVersion() throws AbortException {
 		if ( bshVersion != null )
 			return bshVersion;
 
@@ -98,16 +97,19 @@ public class BshServlet extends HttpServlet
 			sendRaw( 
 				request, response, scriptError, scriptResult, scriptOutput );
 		else
-			sendHTML( request, response, script, scriptError, 
-				scriptResult, scriptOutput, capture );
+			try {
+				sendHTML( request, response, script, scriptError,
+                    scriptResult, scriptOutput, capture );
+			} catch (AbortException e) {
+		    	throw new IOException("Abort exception: " + e.toString());
+			}
 	}
 
 	void sendHTML( 
 		HttpServletRequest request, HttpServletResponse response,
 		String script, Exception scriptError, Object scriptResult, 
 		StringBuffer scriptOutput, boolean capture )
-		throws IOException
-	{
+		throws IOException, AbortException {
 		// Format the output using a simple templating utility
 		SimpleTemplate st = new SimpleTemplate( 
 			BshServlet.class.getResource("page.template") );
@@ -242,8 +244,7 @@ public class BshServlet extends HttpServlet
 	Object evalScript( 
 		String script, StringBuffer scriptOutput, boolean captureOutErr,
 		HttpServletRequest request, HttpServletResponse response )
-		throws EvalError
-	{
+        throws EvalError, AbortException {
 		// Create a PrintStream to capture output
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream pout = new PrintStream( baos );

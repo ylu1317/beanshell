@@ -68,8 +68,7 @@ class BlockNameSpace extends NameSpace
 	*/
     public Variable	setVariable(
 		String name, Object value, boolean strictJava, boolean recurse )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		if ( weHaveVar( name ) )
 			// set the var here in the block namespace
 			return super.setVariable( name, value, strictJava, false );
@@ -84,9 +83,8 @@ class BlockNameSpace extends NameSpace
 		Typed variables are naturally set locally.
 		This is used in try/catch block argument. 
 	*/
-    public void	setBlockVariable( String name, Object value ) 
-		throws UtilEvalError 
-	{
+    public void	setBlockVariable( String name, Object value )
+		throws UtilEvalError, AbortException {
 		super.setVariable( name, value, false/*strict?*/, false );
 	}
 
@@ -100,7 +98,10 @@ class BlockNameSpace extends NameSpace
 		// super.variables.containsKey( name ) not any faster, I checked
 		try {
 			return super.getVariableImpl( name, false ) != null;
-		} catch ( UtilEvalError e ) { return false; }
+		} catch ( UtilEvalError e ) { return false; } catch (AbortException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 /**

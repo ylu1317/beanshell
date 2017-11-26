@@ -32,13 +32,11 @@ import java.util.*;
 import java.lang.ref.*;
 import java.io.IOException;
 import java.io.*;
+
+import bsh.*;
 import bsh.classpath.BshClassPath.ClassSource;
 import bsh.classpath.BshClassPath.JarClassSource;
 import bsh.classpath.BshClassPath.GeneratedClassSource;
-import bsh.BshClassManager;
-import bsh.ClassPathException;
-import bsh.Interpreter;  // for debug()
-import bsh.UtilEvalError; 
 
 /**
 	<pre>
@@ -221,7 +219,12 @@ public class ClassManagerImpl extends BshClassManager
 
 		// Try .java source file
 		if ( c == null )
-			c = loadSourceClass( name );
+			try {
+				c = loadSourceClass( name );
+			} catch (AbortException e) {
+		    	System.err.println("Abort Exception: " + e.toString());
+		    	return null;
+			}
 
 		// Cache result (or null for not found)
 		// Note: plainClassForName already caches, so it will be redundant

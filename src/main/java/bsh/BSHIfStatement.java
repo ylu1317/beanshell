@@ -32,9 +32,9 @@ class BSHIfStatement extends SimpleNode
 {
     BSHIfStatement(int id) { super(id); }
 
-    public Object eval(CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-    {
+    public Object eval(CallStack callstack, Interpreter interpreter)
+        throws EvalError, AbortException {
+        this.check_abort(this, interpreter);
         Object ret = null;
 
         if( evaluateCondition( 
@@ -51,9 +51,8 @@ class BSHIfStatement extends SimpleNode
     }
 
     public static boolean evaluateCondition(
-		SimpleNode condExp, CallStack callstack, Interpreter interpreter) 
-		throws EvalError
-    {
+		SimpleNode condExp, CallStack callstack, Interpreter interpreter)
+        throws EvalError, AbortException {
         Object obj = condExp.eval(callstack, interpreter);
         if(obj instanceof Primitive) {
 			if ( obj == Primitive.VOID )

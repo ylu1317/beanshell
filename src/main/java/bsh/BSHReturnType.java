@@ -39,8 +39,7 @@ class BSHReturnType extends SimpleNode
 	}
 
 	public String getTypeDescriptor( 
-		CallStack callstack, Interpreter interpreter, String defaultPackage ) 
-	{
+		CallStack callstack, Interpreter interpreter, String defaultPackage ) throws AbortException {
 		if ( isVoid )
 			return "V";
 		else
@@ -49,8 +48,8 @@ class BSHReturnType extends SimpleNode
 	}
 
 	public Class evalReturnType( 
-		CallStack callstack, Interpreter interpreter ) throws EvalError
-	{
+		CallStack callstack, Interpreter interpreter ) throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		if ( isVoid )
 			return Void.TYPE;
 		else

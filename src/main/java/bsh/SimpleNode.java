@@ -149,11 +149,16 @@ class SimpleNode implements Node
 	/**
 		This is the general signature for evaluation of a node.
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter ) 
-		throws EvalError
-	{
+	public Object eval( CallStack callstack, Interpreter interpreter )
+        throws EvalError, AbortException {
 		throw new InterpreterError(
 			"Unimplemented or inappropriate for " + getClass().getName() );
+	}
+
+	protected void check_abort(SimpleNode node, Interpreter interpreter) throws AbortException {
+	    if(interpreter.get_abort() || Thread.currentThread().isInterrupted()) {
+	        throw new AbortException(node);
+        }
 	}
 
 	/**

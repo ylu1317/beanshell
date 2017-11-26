@@ -173,9 +173,8 @@ class Name implements java.io.Serializable
 		"this.caller" magic field.
 		"this.callstack" magic field.
 	*/
-	public Object toObject( CallStack callstack, Interpreter interpreter ) 
-		throws UtilEvalError
-	{
+	public Object toObject( CallStack callstack, Interpreter interpreter )
+		throws UtilEvalError, AbortException {
 		return toObject( callstack, interpreter, false );
 	}
 
@@ -186,9 +185,8 @@ class Name implements java.io.Serializable
 		that we want a class; where in general the var path may be taken.
 	*/
 	synchronized public Object toObject( 
-		CallStack callstack, Interpreter interpreter, boolean forceClass ) 
-		throws UtilEvalError
-	{
+		CallStack callstack, Interpreter interpreter, boolean forceClass )
+		throws UtilEvalError, AbortException {
 		reset();
 
 		Object obj = null;
@@ -221,9 +219,8 @@ class Name implements java.io.Serializable
 	*/
 	private Object consumeNextObjectField( 	
 		CallStack callstack, Interpreter interpreter, 
-		boolean forceClass, boolean autoAllocateThis ) 
-		throws UtilEvalError
-	{
+		boolean forceClass, boolean autoAllocateThis )
+		throws UtilEvalError, AbortException {
 		/*
 			Is it a simple variable name?
 			Doing this first gives the correct Java precedence for vars 
@@ -469,9 +466,8 @@ class Name implements java.io.Serializable
 	*/
 	Object resolveThisFieldReference( 
 		CallStack callstack, NameSpace thisNameSpace, Interpreter interpreter, 
-		String varName, boolean specialFieldsVisible ) 
-		throws UtilEvalError
-	{
+		String varName, boolean specialFieldsVisible )
+		throws UtilEvalError, AbortException {
 		if ( varName.equals("this") ) 
 		{
 			/*
@@ -622,9 +618,8 @@ class Name implements java.io.Serializable
 		@throws ClassPathException (type of EvalError) on special case of 
 		ambiguous unqualified name after super import. 
 	*/
-	synchronized public Class toClass() 
-		throws ClassNotFoundException, UtilEvalError
-	{
+	synchronized public Class toClass()
+		throws ClassNotFoundException, UtilEvalError, AbortException {
 		if ( asClass != null )
 			return asClass;
 
@@ -666,8 +661,7 @@ class Name implements java.io.Serializable
 	*/
 	synchronized public LHS toLHS( 
 		CallStack callstack, Interpreter interpreter )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		// Should clean this up to a single return statement
 		reset();
 		LHS lhs;
@@ -779,8 +773,7 @@ class Name implements java.io.Serializable
 		Interpreter interpreter, Object[] args, CallStack callstack,
 		SimpleNode callerInfo
 	)
-        throws UtilEvalError, EvalError, ReflectError, InvocationTargetException
-    {
+		throws UtilEvalError, EvalError, ReflectError, InvocationTargetException, AbortException {
         String methodName = Name.suffix(value, 1);
 		BshClassManager bcm = interpreter.getClassManager();
 		NameSpace namespace = callstack.top();
@@ -886,7 +879,7 @@ class Name implements java.io.Serializable
 		Interpreter interpreter, Object[] args, CallStack callstack,
 		SimpleNode callerInfo
 	)
-        throws EvalError/*, ReflectError, InvocationTargetException*/
+		throws EvalError, AbortException/*, ReflectError, InvocationTargetException*/
     {
         if ( Interpreter.DEBUG ) 
         	Interpreter.debug( "invokeLocalMethod: " + value );

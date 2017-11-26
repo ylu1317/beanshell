@@ -27,20 +27,7 @@
 
 package bsh;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.StringReader;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -97,8 +84,7 @@ import java.lang.reflect.Method;
 	See the BeanShell User's Manual for more information.
 */
 public class Interpreter 
-	implements Runnable, ConsoleInterface,Serializable
-{
+	implements Runnable, ConsoleInterface,Serializable {
 	/* --- Begin static members --- */
 
 	public static final String VERSION = "2.0b6";
@@ -156,6 +142,32 @@ public class Interpreter
 	/** Control the verbose printing of results for the show() command. */
 	private boolean showResults;
 
+    /**
+     * This flag should be set by the thread owner so that we can abort the evaluation any time we want
+     */
+    private boolean is_abort = false;
+    public boolean get_abort() {
+        synchronized (this) {
+            return this.is_abort;
+        }
+    }
+    public void set_abort(boolean b) {
+        synchronized (this) {
+            this.is_abort = b;
+        }
+    }
+
+    private NameSpace run_namespace;
+    private String run_code;
+    private Reader run_reader;
+    public void prepare_run(String code, NameSpace ns, PrintStream out, PrintStream err) throws UnsupportedEncodingException {
+        this.run_code = code;
+        this.run_namespace = ns;
+        this.run_reader = new StringReader(this.run_code);
+        this.out = out;
+        this.err = err;
+    }
+
 	/* --- End instance data --- */
 
 	/**
@@ -175,8 +187,7 @@ public class Interpreter
     public Interpreter(
 		Reader in, PrintStream out, PrintStream err, 
 		boolean interactive, NameSpace namespace,
-		Interpreter parent, String sourceFileInfo )
-    {
+		Interpreter parent, String sourceFileInfo ) throws AbortException {
 		//System.out.println("New Interpreter: "+this +", sourcefile = "+sourceFileInfo );
 		parser = new Parser( in );
 		long t1=System.currentTimeMillis();
@@ -216,14 +227,12 @@ public class Interpreter
 
     public Interpreter(
 		Reader in, PrintStream out, PrintStream err, 
-		boolean interactive, NameSpace namespace)
-    {
+		boolean interactive, NameSpace namespace) throws AbortException {
 		this( in, out, err, interactive, namespace, null, null );
 	}
 
     public Interpreter(
-		Reader in, PrintStream out, PrintStream err, boolean interactive)
-    {
+		Reader in, PrintStream out, PrintStream err, boolean interactive) throws AbortException {
         this(in, out, err, interactive, null);
     }
 
@@ -231,9 +240,8 @@ public class Interpreter
 		Construct a new interactive interpreter attached to the specified 
 		console using the specified parent namespace.
 	*/
-    public Interpreter(ConsoleInterface console, NameSpace globalNameSpace) {
-
-        this( console.getIn(), console.getOut(), console.getErr(), 
+    public Interpreter(ConsoleInterface console, NameSpace globalNameSpace) throws AbortException {
+        this( console.getIn(), console.getOut(), console.getErr(),
 			true, globalNameSpace );
 
 		setConsole( console );
@@ -243,15 +251,14 @@ public class Interpreter
 		Construct a new interactive interpreter attached to the specified 
 		console.
 	*/
-    public Interpreter(ConsoleInterface console) {
+    public Interpreter(ConsoleInterface console) throws AbortException {
         this(console, null);
     }
 
 	/**
 		Create an interpreter for evaluation only.
 	*/
-    public Interpreter()
-    {
+    public Interpreter() throws AbortException {
 		this( new StringReader(""), 
 			System.out, System.err, false, null );
         evalOnly = true;
@@ -273,8 +280,7 @@ public class Interpreter
 		// need to set the input stream - reinit the parser?
 	}
 
-	private void initRootSystemObject() 
-	{
+	private void initRootSystemObject() throws AbortException {
 		BshClassManager bcm = getClassManager();
 		// bsh
 		setu("bsh", new NameSpace(null, bcm, "Bsh Object" ).getThis( this ) );
@@ -347,8 +353,7 @@ public class Interpreter
 	/**
 		Run the text only interpreter on the command line or specify a file.
 	*/
-    public static void main( String [] args ) 
-	{
+    public static void main( String [] args ) throws AbortException {
         if ( args.length > 0 ) {
 			String filename = args[0];
 
@@ -422,13 +427,23 @@ public class Interpreter
 			main.invoke( null, new Object [] { args } );
 	}
 
+
+
 	/**
 		Run interactively.  (printing prompts, etc.)
 	*/
-    public void run() 
+    public void run()
 	{
-        if(evalOnly)
-            throw new RuntimeException("bsh Interpreter: No stream");
+        if(evalOnly) {
+            try {
+                this.eval(this.run_reader, this.run_namespace, this.run_code);
+            } catch (EvalError evalError) {
+                this.error(evalError.getMessage());
+            } catch (AbortException e) {
+                this.error(e.getMessage());
+            }
+            return;
+        }
 
         /*
           We'll print our banner using eval(String) in order to
@@ -436,14 +451,17 @@ public class Interpreter
           This ameliorates the delay after typing the first statement.
         */
         if ( interactive )
-			try { 
-				eval("printBanner();"); 
+			try {
+				eval("printBanner();");
 			} catch ( EvalError e ) {
 				println(
 					"BeanShell "+VERSION+" - by Pat Niemeyer (pat@pat.net)");
-			}
+			} catch (AbortException e) {
+                throw new RuntimeException("Abort: " + e.toString());
+                // e.printStackTrace();
+            }
 
-		// init the callstack.  
+        // init the callstack.
 		CallStack callstack = new CallStack( globalNameSpace );
 
         boolean eof = false;
@@ -567,9 +585,8 @@ public class Interpreter
 	/**
 		Read text from fileName and eval it.
 	*/
-    public Object source( String filename, NameSpace nameSpace ) 
-		throws FileNotFoundException, IOException, EvalError 
-	{
+    public Object source( String filename, NameSpace nameSpace )
+        throws FileNotFoundException, IOException, EvalError, AbortException {
 		File file = pathToFile( filename );
 		if ( Interpreter.DEBUG ) debug("Sourcing file: "+file);
 		Reader sourceIn = new BufferedReader( new FileReader(file) );
@@ -584,9 +601,8 @@ public class Interpreter
 		Read text from fileName and eval it.
 		Convenience method.  Use the global namespace.
 	*/
-    public Object source( String filename ) 
-		throws FileNotFoundException, IOException, EvalError 
-	{
+    public Object source( String filename )
+        throws FileNotFoundException, IOException, EvalError, AbortException {
 		return source( filename, globalNameSpace );
 	}
 
@@ -615,9 +631,8 @@ public class Interpreter
 
     public Object eval( 
 		Reader in, NameSpace nameSpace, String sourceFileInfo
-			/*, CallStack callstack */ ) 
-		throws EvalError 
-	{
+			/*, CallStack callstack */ )
+        throws EvalError, AbortException {
 		Object retVal = null;
 		if ( Interpreter.DEBUG ) debug("eval: nameSpace = "+nameSpace);
 
@@ -726,15 +741,14 @@ public class Interpreter
 	/**
 		Evaluate the inputstream in this interpreter's global namespace.
 	*/
-    public Object eval( Reader in ) throws EvalError 
-	{
+    public Object eval( Reader in ) throws EvalError, AbortException {
 		return eval( in, globalNameSpace, "eval stream" );
 	}
 
 	/**
 		Evaluate the string in this interpreter's global namespace.
 	*/
-    public Object eval( String statements ) throws EvalError {
+    public Object eval( String statements ) throws EvalError, AbortException {
 		if ( Interpreter.DEBUG ) debug("eval(String): "+statements);
 		return eval(statements, globalNameSpace);
 	}
@@ -742,9 +756,8 @@ public class Interpreter
 	/**
 		Evaluate the string in the specified namespace.
 	*/
-    public Object eval( String statements, NameSpace nameSpace ) 
-		throws EvalError 
-	{
+    public Object eval( String statements, NameSpace nameSpace )
+        throws EvalError, AbortException {
 
 		String s = ( statements.endsWith(";") ? statements : statements+";" );
         return eval( 
@@ -835,8 +848,7 @@ public class Interpreter
 		Get the value of the name.
 		name may be any value. e.g. a variable or field
 	*/
-    public Object get( String name ) throws EvalError
-	{
+    public Object get( String name ) throws EvalError, AbortException {
 		try {
 			Object ret = globalNameSpace.get( name, this );
 			return Primitive.unwrap( ret );
@@ -848,7 +860,7 @@ public class Interpreter
 	/**
 		Unchecked get for internal use
 	*/
-    Object getu( String name ) {
+    Object getu( String name ) throws AbortException {
 		try { 
 			return get( name );
 		} catch ( EvalError e ) { 
@@ -861,8 +873,7 @@ public class Interpreter
 		name may evaluate to anything assignable. e.g. a variable or field.
 	*/
     public void set( String name, Object value )
-		throws EvalError 
-	{
+        throws EvalError, AbortException {
 		// map null to Primtive.NULL coming in...
 		if ( value == null )
 			value = Primitive.NULL;
@@ -889,22 +900,25 @@ public class Interpreter
 			set(name, value);
 		} catch ( EvalError e ) { 
 			throw new InterpreterError("set: "+e);
-		}
-	}
+		} catch (AbortException e) {
+		    throw new InterpreterError("Abort exception: " + e.toString());
+            // e.printStackTrace();
+        }
+    }
 
-    public void set(String name, long value) throws EvalError {
+    public void set(String name, long value) throws EvalError, AbortException {
         set(name, new Primitive(value));
 	}
-    public void set(String name, int value) throws EvalError {
+    public void set(String name, int value) throws EvalError, AbortException {
         set(name, new Primitive(value));
 	}
-    public void set(String name, double value) throws EvalError {
+    public void set(String name, double value) throws EvalError, AbortException {
         set(name, new Primitive(value));
 	}
-    public void set(String name, float value) throws EvalError {
+    public void set(String name, float value) throws EvalError, AbortException {
         set(name, new Primitive(value));
 	}
-    public void set(String name, boolean value) throws EvalError {
+    public void set(String name, boolean value) throws EvalError, AbortException {
         set(name, value ? Primitive.TRUE : Primitive.FALSE);
 	}
 
@@ -912,9 +926,8 @@ public class Interpreter
 		Unassign the variable name.	
 		Name should evaluate to a variable.
 	*/
-    public void unset( String name ) 
-		throws EvalError 
-	{
+    public void unset( String name )
+        throws EvalError, AbortException {
 		/*
 			We jump through some hoops here to handle arbitrary cases like
 			unset("bsh.foo");
@@ -1029,9 +1042,8 @@ public class Interpreter
 		Localize a path to the file name based on the bsh.cwd interpreter 
 		working directory.
 	*/
-    public File pathToFile( String fileName ) 
-		throws IOException
-	{
+    public File pathToFile( String fileName )
+        throws IOException, AbortException {
 		File file = new File( fileName );
 
 		// if relative, fix up to bsh.cwd
@@ -1079,7 +1091,7 @@ public class Interpreter
 
 		@see BshClassManager#setClassLoader( ClassLoader )
 	*/
-	public void setClassLoader( ClassLoader externalCL ) {
+	public void setClassLoader( ClassLoader externalCL ) throws AbortException {
 		getClassManager().setClassLoader( externalCL );
 	}
 
@@ -1088,8 +1100,7 @@ public class Interpreter
 		(the BshClassManager of this interpreter's global namespace).
 		This is primarily a convenience method.
 	*/
-	public BshClassManager getClassManager() 
-	{
+	public BshClassManager getClassManager() throws AbortException {
 		return getNameSpace().getClassManager();
 	}
 	

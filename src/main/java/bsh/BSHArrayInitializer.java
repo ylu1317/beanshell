@@ -35,9 +35,9 @@ class BSHArrayInitializer extends SimpleNode
     BSHArrayInitializer(int id) { super(id); }
 
     public Object eval( CallStack callstack, Interpreter interpreter )
-		throws EvalError 
-	{
-		throw new EvalError( "Array initializer has no base type.", 
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
+		throw new EvalError( "Array initializer has no base type.",
 			this, callstack );
 	}
 
@@ -49,9 +49,9 @@ class BSHArrayInitializer extends SimpleNode
 			e.g. 2 for a String [][];
 	*/
     public Object eval( Class baseType, int dimensions, 
-						CallStack callstack, Interpreter interpreter ) 
-		throws EvalError
-    {
+						CallStack callstack, Interpreter interpreter )
+		throws EvalError, AbortException {
+    	this.check_abort(this, interpreter);
         int numInitializers = jjtGetNumChildren();
 
 		// allocate the array to store the initializers

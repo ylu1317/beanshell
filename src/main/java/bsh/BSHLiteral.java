@@ -35,8 +35,8 @@ class BSHLiteral extends SimpleNode
     BSHLiteral(int id) { super(id); }
 
     public Object eval( CallStack callstack, Interpreter interpreter )
-		throws EvalError
-    {
+        throws EvalError, AbortException {
+        this.check_abort(this, interpreter);
 		if ( value == null )
 			throw new InterpreterError("Null in bsh literal: "+value);
 

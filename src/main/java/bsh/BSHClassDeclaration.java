@@ -52,8 +52,8 @@ class BSHClassDeclaration extends SimpleNode
 	/**
 	*/
 	public Object eval( CallStack callstack, Interpreter interpreter )
-		throws EvalError
-	{
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		int child = 0;
 
 		// resolve superclass if any

@@ -145,8 +145,7 @@ public class ExternalNameSpace extends NameSpace
 		if they are removed via the extenal map.
 	*/
 		protected Variable getVariableImpl( String name, boolean recurse )
-		throws UtilEvalError
-	{
+			throws UtilEvalError, AbortException {
 		// check the external map for the variable name
 		Object value =  externalMap.get( name );
 
@@ -179,8 +178,7 @@ public class ExternalNameSpace extends NameSpace
     }
 
 	public Variable createVariable(
-		String name, Class type, Object value, Modifiers mods )
-	{
+		String name, Class type, Object value, Modifiers mods ) throws AbortException {
 		LHS lhs = new LHS( externalMap, name );
 		// Is this race condition worth worrying about?
 		// value will appear in map before it's really in the interpreter

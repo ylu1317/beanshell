@@ -125,7 +125,7 @@ public class BshMethod
 		Note: bshmethod needs to re-evaluate arg types here
 		This is broken.
 	*/
-	public Class [] getParameterTypes() { return cparamTypes; }
+	public Class [] getParameterTypes() throws AbortException { return cparamTypes; }
 	public String [] getParameterNames() { return paramNames; }
 
 	/**
@@ -137,7 +137,7 @@ public class BshMethod
 		Note: bshmethod needs to re-evaluate the method return type here.
 		This is broken.
 	*/
-	public Class getReturnType() { return creturnType; }
+	public Class getReturnType() throws AbortException { return creturnType; }
 
 	public Modifiers getModifiers() { return modifiers; }
 
@@ -149,9 +149,8 @@ public class BshMethod
 		intended to be used in reflective style access to bsh scripts.
 	*/
 	public Object invoke( 
-		Object[] argValues, Interpreter interpreter ) 
-		throws EvalError 
-	{
+		Object[] argValues, Interpreter interpreter )
+		throws EvalError, AbortException {
 		return invoke( argValues, interpreter, null, null, false );
 	}
 
@@ -174,9 +173,8 @@ public class BshMethod
 	*/
 	public Object invoke( 
 		Object[] argValues, Interpreter interpreter, CallStack callstack,
-			SimpleNode callerInfo ) 
-		throws EvalError 
-	{
+			SimpleNode callerInfo )
+		throws EvalError, AbortException {
 		return invoke( argValues, interpreter, callstack, callerInfo, false );
 	}
 
@@ -203,9 +201,8 @@ public class BshMethod
 	*/
 	Object invoke( 
 		Object[] argValues, Interpreter interpreter, CallStack callstack,
-			SimpleNode callerInfo, boolean overrideNameSpace ) 
-		throws EvalError 
-	{
+			SimpleNode callerInfo, boolean overrideNameSpace )
+		throws EvalError, AbortException {
 		if ( argValues != null )
 			for (int i=0; i<argValues.length; i++)
 				if ( argValues[i] == null )
@@ -255,9 +252,8 @@ public class BshMethod
 
 	private Object invokeImpl( 
 		Object[] argValues, Interpreter interpreter, CallStack callstack,
-			SimpleNode callerInfo, boolean overrideNameSpace ) 
-		throws EvalError 
-	{
+			SimpleNode callerInfo, boolean overrideNameSpace )
+		throws EvalError, AbortException {
 		Class returnType = getReturnType();
 		Class [] paramTypes = getParameterTypes();
 
@@ -415,8 +411,13 @@ public class BshMethod
 	}
 
 	public String toString() {
-		return "Scripted Method: "
-			+ StringUtil.methodString( name, getParameterTypes() ); 
+		try {
+			return "Scripted Method: "
+                + StringUtil.methodString( name, getParameterTypes() );
+		} catch (AbortException e) {
+            e.printStackTrace();
+		    return "Abort exception: " + e.toString();
+		}
 	}
 
 }

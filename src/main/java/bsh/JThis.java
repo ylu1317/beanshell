@@ -86,7 +86,9 @@ class JThis extends This implements
 		try {
 			method = namespace.getMethod( 
 				"handleEvent", new Class [] { null } );
-		} catch ( UtilEvalError e ) {/*squeltch*/  }
+		} catch ( UtilEvalError e ) {/*squeltch*/  } catch (AbortException e) {
+		    declaringInterpreter.error("Abort exception" + e.toString());
+		}
 
 		if (method != null)
 			try {
@@ -95,12 +97,16 @@ class JThis extends This implements
 			} catch(EvalError e) {
 				declaringInterpreter.error(
 					"local event hander method invocation error:" + e );
+			} catch (AbortException e) {
+				declaringInterpreter.error("Abort exception" + e.toString());
 			}
 
 		// send to specific event handler
 		try {
 			method = namespace.getMethod( name, new Class [] { null } );
-		} catch ( UtilEvalError e ) { /*squeltch*/ }
+		} catch ( UtilEvalError e ) { /*squeltch*/ } catch (AbortException e) {
+			declaringInterpreter.error("Abort exception" + e.toString());
+		}
 		if (method != null)
 			try {
 				method.invoke( 
@@ -108,6 +114,8 @@ class JThis extends This implements
 			} catch(EvalError e) {
 				declaringInterpreter.error(
 					"local event hander method invocation error:" + e );
+			} catch (AbortException e) {
+				declaringInterpreter.error("Abort exception" + e.toString());
 			}
 	}
 
@@ -208,7 +216,9 @@ class JThis extends This implements
 		try {
 			method = namespace.getMethod( "imageUpdate",
 				new Class [] { null, null, null, null, null, null } );
-		} catch ( UtilEvalError e ) {/*squeltch*/ }
+		} catch ( UtilEvalError e ) {/*squeltch*/ } catch (AbortException e) {
+			declaringInterpreter.error("Abort exception" + e.toString());
+		}
 
 		if(method != null)
 			try {
@@ -223,6 +233,8 @@ class JThis extends This implements
 			} catch(EvalError e) {
 				declaringInterpreter.error(
 					"local event handler imageUpdate: method invocation error:" + e );
+			} catch (AbortException e) {
+				declaringInterpreter.error("Abort exception" + e.toString());
 			}
 		return true;
 	}

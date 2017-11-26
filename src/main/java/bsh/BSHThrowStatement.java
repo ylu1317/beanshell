@@ -32,9 +32,9 @@ class BSHThrowStatement extends SimpleNode
 {
 	BSHThrowStatement(int id) { super(id); }
 
-	public Object eval( CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-	{
+	public Object eval( CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		Object obj = ((SimpleNode)jjtGetChild(0)).eval(callstack, interpreter);
 
 		// need to loosen this to any throwable... do we need to handle

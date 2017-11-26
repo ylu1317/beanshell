@@ -46,7 +46,9 @@ class BSHEnhancedForStatement extends SimpleNode implements ParserConstants {
     }
 
 
-    public Object eval(CallStack callstack, Interpreter interpreter) throws EvalError {
+    public Object eval(CallStack callstack, Interpreter interpreter) throws EvalError, AbortException {
+
+        this.check_abort(this, interpreter);
         Class elementType = null;
         SimpleNode expression;
         SimpleNode statement = null;

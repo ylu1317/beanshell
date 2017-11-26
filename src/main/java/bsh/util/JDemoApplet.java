@@ -55,13 +55,22 @@ public class JDemoApplet extends JApplet
 			} catch ( EvalError evalError ) {
 				System.out.println( evalError );
 				evalError.printStackTrace();
+			} catch (AbortException e) {
+				System.out.println("Abort Exception: " + e.toString());
+				e.printStackTrace();
 			}
 		else
 		{
 			getContentPane().setLayout(new BorderLayout());
 			JConsole console = new JConsole();
 			getContentPane().add("Center", console);
-			Interpreter interpreter = new Interpreter( console );
+			Interpreter interpreter = null;
+			try {
+				interpreter = new Interpreter( console );
+			} catch (AbortException e) {
+				System.out.println("Abort Exception: " + e.toString());
+				e.printStackTrace();
+			}
 			new Thread(interpreter).start();
 		}
 	}

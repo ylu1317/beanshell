@@ -35,8 +35,8 @@ class BSHSwitchStatement
 	public BSHSwitchStatement(int id) { super(id); }
 
     public Object eval( CallStack callstack, Interpreter interpreter )
-		throws EvalError
-	{
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		int numchild = jjtGetNumChildren();
 		int child = 0;
 		SimpleNode switchExp = ((SimpleNode)jjtGetChild(child++));

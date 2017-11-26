@@ -73,9 +73,14 @@ public class TargetError extends EvalError
 
 	public String toString() 
 	{
-		return super.toString() 
-			+ "\nTarget exception: " + 
-			printTargetError( getCause() );
+		try {
+			return super.toString()
+                + "\nTarget exception: " +
+                printTargetError( getCause() );
+		} catch (AbortException e) {
+			e.printStackTrace();
+		    return "Abort Exception: " +e.toString();
+		}
 	}
 
     public void printStackTrace() { 
@@ -99,8 +104,7 @@ public class TargetError extends EvalError
 		If the proxy mechanism is available, allow the extended print to
 		check for UndeclaredThrowableException and print that embedded error.
 	*/
-	public String printTargetError( Throwable t ) 
-	{
+	public String printTargetError( Throwable t ) throws AbortException {
 		String s = getCause().toString();
 
 		if ( Capabilities.canGenerateInterfaces() )
@@ -118,8 +122,7 @@ public class TargetError extends EvalError
 		This is acceptable here because we're not in a critical path...
 		Otherwise we'd need yet another dynamically loaded module just for this.
 	*/
-	public String xPrintTargetError( Throwable t ) 
-	{
+	public String xPrintTargetError( Throwable t ) throws AbortException {
 		String getTarget =
 			"import java.lang.reflect.UndeclaredThrowableException;"+
 			"String result=\"\";"+

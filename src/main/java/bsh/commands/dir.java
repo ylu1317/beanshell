@@ -51,8 +51,7 @@ public class dir
 	/**
 		Implement dir() command.
 	*/
-	public static void invoke( Interpreter env, CallStack callstack ) 
-	{
+	public static void invoke( Interpreter env, CallStack callstack ) throws AbortException {
 		String dir = ".";
 		invoke( env, callstack, dir );
 	}
@@ -61,8 +60,7 @@ public class dir
 		Implement dir( String directory ) command.
 	*/
 	public static void invoke( 
-		Interpreter env, CallStack callstack, String dir ) 
-	{
+		Interpreter env, CallStack callstack, String dir ) throws AbortException {
 		File file;
 		String path;
 		try {

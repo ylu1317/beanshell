@@ -127,8 +127,7 @@ public class ClassGeneratorUtil implements Constants
 		Modifiers classModifiers, String className, String packageName,
 		Class superClass, Class [] interfaces, Variable [] vars,
 		DelayedEvalBshMethod [] bshmethods, boolean isInterface
-	)
-	{
+	) throws AbortException {
 		this.classModifiers = classModifiers;
 		this.className = className;
 		if ( packageName != null )
@@ -160,8 +159,7 @@ public class ClassGeneratorUtil implements Constants
 		are using a previously generated class.
 	*/
 	public void initStaticNameSpace(
-		NameSpace classStaticNameSpace, BSHBlock instanceInitBlock )
-	{
+		NameSpace classStaticNameSpace, BSHBlock instanceInitBlock ) throws AbortException {
 		try {
 			classStaticNameSpace.setLocalVariable(
 				BSHCONSTRUCTORS, constructors, false/*strict*/ );
@@ -174,8 +172,7 @@ public class ClassGeneratorUtil implements Constants
 	}
 
 	private void splitMethodsAndConstructors(
-		String className, DelayedEvalBshMethod[] bshmethods )
-	{
+		String className, DelayedEvalBshMethod[] bshmethods ) throws AbortException {
 		// Split the methods into constructors and regular method lists
 		List consl = new ArrayList();
 		List methodsl = new ArrayList();
@@ -884,8 +881,7 @@ public class ClassGeneratorUtil implements Constants
 	*/
 	public static ConstructorArgs getConstructorArgs(
 		String superClassName, This classStaticThis,
-		Object [] consArgs, int index )
-	{
+		Object [] consArgs, int index ) throws AbortException {
 		if ( classStaticThis == null )
 			throw new InterpreterError( "Unititialized class: no static" );
 
@@ -1131,8 +1127,7 @@ public class ClassGeneratorUtil implements Constants
 	 	to minimize the generated code.  All we really do here is a simple
 	 	if condition for now.
 	*/
-	public static void initStatic( Class genClass )
-	{
+	public static void initStatic( Class genClass ) throws AbortException {
 		startInterpreterForClass( genClass );
 	}
 
@@ -1257,8 +1252,7 @@ public class ClassGeneratorUtil implements Constants
 	 	cache the correct class in the class manager for the interpreter to
 	 	insure that it is found and associated with the scripted body.
 	*/
-	public static void startInterpreterForClass( Class genClass )
-	{
+	public static void startInterpreterForClass( Class genClass ) throws AbortException {
 		String fqClassName = genClass.getName();
 		String baseName = Name.suffix( fqClassName, 1 );
 		String resName = baseName+".bsh";

@@ -40,9 +40,9 @@ class BSHBinaryExpression extends SimpleNode
 
     BSHBinaryExpression(int id) { super(id); }
 
-    public Object eval( CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-    {
+    public Object eval( CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
         Object lhs = ((SimpleNode)jjtGetChild(0)).eval(callstack, interpreter);
 
 		/*

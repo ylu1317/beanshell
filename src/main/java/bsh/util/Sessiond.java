@@ -90,7 +90,9 @@ class SessiondConnection extends Thread
 			i.setExitOnEOF( false ); // don't exit interp
 			i.run();
 		}
-		catch(IOException e) { System.out.println(e); }
+		catch(IOException e) { System.out.println(e); } catch (AbortException e) {
+		    System.err.println("Abort Exception: " + e.toString());
+		}
 	}
 }
 

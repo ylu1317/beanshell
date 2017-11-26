@@ -76,8 +76,7 @@ class BSHType extends SimpleNode
 		 package for the name.
 	*/
     public String getTypeDescriptor( 
-		CallStack callstack, Interpreter interpreter, String defaultPackage ) 
-    {
+		CallStack callstack, Interpreter interpreter, String defaultPackage ) throws AbortException {
         // return cached type if available
 		if ( descriptor != null )
 			return descriptor;
@@ -133,9 +132,8 @@ class BSHType extends SimpleNode
         return descriptor;
     }
 
-    public Class getType( CallStack callstack, Interpreter interpreter ) 
-		throws EvalError
-    {
+    public Class getType( CallStack callstack, Interpreter interpreter )
+		throws EvalError, AbortException {
         // return cached type if available
 		if ( type != null )
 			return type;

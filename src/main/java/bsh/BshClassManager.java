@@ -120,8 +120,7 @@ public class BshClassManager
 		@see bsh.Interpreter.getClassManager()
 		@see bsh.Interpreter.setClassLoader( ClassLoader )
 	*/
-	public static BshClassManager createClassManager( Interpreter interpreter ) 
-	{
+	public static BshClassManager createClassManager( Interpreter interpreter ) throws AbortException {
 		BshClassManager manager;
 
 		// Do we have the necessary jdk1.2 packages and optional package?
@@ -146,7 +145,7 @@ public class BshClassManager
 		return manager;
 	}
 
-	public boolean classExists( String name ) {
+	public boolean classExists( String name ) throws AbortException {
 		return ( classForName( name ) != null );
 	}
 
@@ -158,8 +157,7 @@ public class BshClassManager
 		management package.
 		@return the class or null
 	*/
-	public Class classForName( String name ) 
-	{
+	public Class classForName( String name ) throws AbortException {
 		if ( isClassBeingDefined( name ) )
 			throw new InterpreterError(
 				"Attempting to load class in the process of being defined: "
@@ -171,15 +169,14 @@ public class BshClassManager
 		} catch ( ClassNotFoundException e ) { /*ignore*/ }
 
 		// try scripted class
-		if ( clas == null ) 
+		if ( clas == null )
 			clas = loadSourceClass( name );
 
 		return clas;
 	}
 	
 	// Move me to classpath/ClassManagerImpl???
-	protected Class loadSourceClass( String name )
-	{
+	protected Class loadSourceClass( String name ) throws AbortException {
 		String fileName = "/"+name.replace('.','/')+".java";
 		InputStream in = getResourceAsStream( fileName );
 		if ( in == null )

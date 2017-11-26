@@ -35,10 +35,10 @@ class BSHAssignment extends SimpleNode implements ParserConstants
     BSHAssignment(int id) { super(id); }
 
     public Object eval(
-		CallStack callstack, Interpreter interpreter) 
-		throws EvalError
-    {
-        BSHPrimaryExpression lhsNode = 
+		CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
+        BSHPrimaryExpression lhsNode =
 			(BSHPrimaryExpression)jjtGetChild(0);
 
 		if ( lhsNode == null )

@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 public class Namespace_chaining {
 
     @Test
-    public void namespace_nesting() throws UtilEvalError {
+    public void namespace_nesting() throws UtilEvalError, AbortException {
         final NameSpace root = new NameSpace( null, "root");
         final NameSpace child = new NameSpace(root, "child");
 

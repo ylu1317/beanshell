@@ -38,8 +38,8 @@ class BSHTypedVariableDeclaration extends SimpleNode
 	}
 
 	Class evalType( CallStack callstack, Interpreter interpreter )
-		throws EvalError
-	{
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		BSHType typeNode = getTypeNode();
 		return typeNode.getType( callstack, interpreter );
 	}
@@ -60,9 +60,9 @@ class BSHTypedVariableDeclaration extends SimpleNode
 		evaluate the type and one or more variable declarators, e.g.:
 			int a, b=5, c;
 	*/
-    public Object eval( CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-    {
+    public Object eval( CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		try {
 			NameSpace namespace = callstack.top();
 			BSHType typeNode = getTypeNode();
@@ -92,8 +92,7 @@ class BSHTypedVariableDeclaration extends SimpleNode
     }
 
 	public String getTypeDescriptor( 
-		CallStack callstack, Interpreter interpreter, String defaultPackage ) 
-	{ 
+		CallStack callstack, Interpreter interpreter, String defaultPackage ) throws AbortException {
 		return getTypeNode().getTypeDescriptor( 
 			callstack, interpreter, defaultPackage );
 	}

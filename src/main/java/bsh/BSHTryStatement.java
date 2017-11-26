@@ -37,9 +37,9 @@ class BSHTryStatement extends SimpleNode
 		super(id);
 	}
 
-	public Object eval( CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-	{
+	public Object eval( CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		BSHBlock tryBlock = ((BSHBlock)jjtGetChild(0));
 
 		Vector catchParams = new Vector();

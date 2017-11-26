@@ -47,6 +47,8 @@ public class Console
 				new Interpreter().eval("desktop()");
 			} catch ( EvalError e ) {
 				System.err.println("Couldn't start desktop: "+e);
+			} catch (AbortException e) {
+			    System.err.println("Abort exception: " + e.toString());
 			}
 		} else {
 			System.err.println(

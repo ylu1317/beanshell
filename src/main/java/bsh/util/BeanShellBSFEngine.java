@@ -9,13 +9,10 @@ package bsh.util;
 */
 
 import java.util.Vector;
+
+import bsh.*;
 import org.apache.bsf.*;
 import org.apache.bsf.util.*;
-import bsh.Interpreter;
-import bsh.InterpreterError;
-import bsh.EvalError;
-import bsh.TargetError;
-import bsh.Primitive;
 
 /**
 	This is the BeanShell adapter for Apache Bean Scripting Framework 2.x.
@@ -42,13 +39,19 @@ public class BeanShellBSFEngine extends BSFEngineImpl
 	{
 		super.initialize( mgr, lang, declaredBeans );
 
-		interpreter = new Interpreter();
+		try {
+			interpreter = new Interpreter();
+		} catch (AbortException e) {
+			throw new BSFException("Abort Exception: " + e.toString());
+		}
 
 		// declare the bsf manager for callbacks, etc.
 		try {
 			interpreter.set( "bsf", mgr );
 		} catch ( EvalError e ) {
 			throw new BSFException("bsh internal error: "+e.toString()); 
+		} catch (AbortException e) {
+			throw new BSFException("Abort Exception: " + e.toString());
 		}
 
 		for(int i=0; i<declaredBeans.size(); i++) 
@@ -80,6 +83,8 @@ public class BeanShellBSFEngine extends BSFEngineImpl
 				object = interpreter.get("global");
 			} catch ( EvalError e ) { 
 				throw new BSFException("bsh internal error: "+e.toString()); 
+			} catch (AbortException e) {
+				throw new BSFException("Abort Exception: " + e.toString());
 			}
 
 		if ( object instanceof bsh.This )
@@ -99,6 +104,8 @@ public class BeanShellBSFEngine extends BSFEngineImpl
 			} catch ( EvalError e3 ) 
 			{
 				throw new BSFException( "BeanShell script error: "+e3 );
+			} catch (AbortException e) {
+				throw new BSFException("Abort Exception: " + e.toString());
 			}
 		else
 			throw new BSFException(
@@ -173,6 +180,8 @@ public class BeanShellBSFEngine extends BSFEngineImpl
 			throw new BSFException(
 				"BeanShell script error: "+e3
 				+ sourceInfo(source,lineNo,columnNo) );
+		} catch (AbortException e) {
+			throw new BSFException("Abort Exception: " + e.toString());
 		}
 	}
 
@@ -201,6 +210,8 @@ public class BeanShellBSFEngine extends BSFEngineImpl
 			throw new BSFException(
 				"BeanShell script error: "+e3
 				+ sourceInfo(source,lineNo,columnNo) );
+		} catch (AbortException e) {
+			throw new BSFException("Abort Exception: " + e.toString());
 		}
 	}
 
@@ -246,6 +257,8 @@ public class BeanShellBSFEngine extends BSFEngineImpl
 		} catch ( EvalError e ) { 
 			throw new BSFException( "error declaring bean: "+bean.name
 			+" : "+e.toString() ); 
+		} catch (AbortException e) {
+			throw new BSFException("Abort Exception: " + e.toString());
 		}
 	}
 
@@ -256,6 +269,8 @@ public class BeanShellBSFEngine extends BSFEngineImpl
 			interpreter.unset( bean.name );
 		} catch ( EvalError e ) {
 			throw new BSFException("bsh internal error: "+e.toString()); 
+		} catch (AbortException e) {
+			throw new BSFException("Abort Exception: " + e.toString());
 		}
 	}
 

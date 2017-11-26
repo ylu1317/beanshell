@@ -50,8 +50,7 @@ class BSHArguments extends SimpleNode
 		be compounded.
 	*/
     public Object[] getArguments( CallStack callstack, Interpreter interpreter)
-		throws EvalError
-    {
+		throws EvalError, AbortException {
         // evaluate each child
         Object[] args = new Object[jjtGetNumChildren()];
         for(int i = 0; i < args.length; i++)

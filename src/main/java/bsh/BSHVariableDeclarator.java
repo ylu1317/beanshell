@@ -54,9 +54,9 @@ class BSHVariableDeclarator extends SimpleNode
 		typeNode may be null to indicate no type information available.
 	*/
     public Object eval( 
-		BSHType typeNode, CallStack callstack, Interpreter interpreter)  
-		throws EvalError
-    {
+		BSHType typeNode, CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		// null value means no value
 		Object value = null;
 

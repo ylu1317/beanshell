@@ -39,9 +39,9 @@ class BSHAllocationExpression extends SimpleNode
     BSHAllocationExpression(int id) { super(id); }
 	private static int innerClassCount = 0;
 	
-    public Object eval( CallStack callstack, Interpreter interpreter) 
-		throws EvalError
-    {
+    public Object eval( CallStack callstack, Interpreter interpreter)
+        throws EvalError, AbortException {
+        check_abort(this, interpreter);
         // type is either a class name or a primitive type
         SimpleNode type = (SimpleNode)jjtGetChild(0);
 
@@ -67,9 +67,8 @@ class BSHAllocationExpression extends SimpleNode
     private Object objectAllocation(
 		BSHAmbiguousName nameNode, BSHArguments argumentsNode, 
 		CallStack callstack, Interpreter interpreter 
-	) 
-		throws EvalError
-    {
+	)
+        throws EvalError, AbortException {
 		NameSpace namespace = callstack.top();
 
         Object[] args = argumentsNode.getArguments( callstack, interpreter );
@@ -168,9 +167,8 @@ class BSHAllocationExpression extends SimpleNode
 	*/
 	private Object constructWithClassBody( 
 		Class type, Object[] args, BSHBlock block,
-		CallStack callstack, Interpreter interpreter ) 
-		throws EvalError
-	{
+		CallStack callstack, Interpreter interpreter )
+        throws EvalError, AbortException {
 		//throw new InterpreterError("constructWithClassBody unimplemented");
 
 		String name = callstack.top().getName() + "$" + (++innerClassCount);
@@ -201,9 +199,8 @@ class BSHAllocationExpression extends SimpleNode
 
 	private Object constructWithInterfaceBody( 
 		Class type, Object[] args, BSHBlock body,
-		CallStack callstack, Interpreter interpreter ) 
-		throws EvalError
-	{
+		CallStack callstack, Interpreter interpreter )
+        throws EvalError, AbortException {
 		NameSpace namespace = callstack.top();
 		NameSpace local = new NameSpace(namespace, "AnonymousBlock");
 		callstack.push(local);
@@ -222,9 +219,8 @@ class BSHAllocationExpression extends SimpleNode
     private Object objectArrayAllocation(
 		BSHAmbiguousName nameNode, BSHArrayDimensions dimensionsNode, 
 		CallStack callstack, Interpreter interpreter 
-	) 
-		throws EvalError
-    {
+	)
+        throws EvalError, AbortException {
 		NameSpace namespace = callstack.top();
         Class type = nameNode.toClass( callstack, interpreter );
         if ( type == null )
@@ -237,9 +233,8 @@ class BSHAllocationExpression extends SimpleNode
     private Object primitiveArrayAllocation(
 		BSHPrimitiveType typeNode, BSHArrayDimensions dimensionsNode, 
 		CallStack callstack, Interpreter interpreter 
-	) 
-		throws EvalError
-    {
+	)
+        throws EvalError, AbortException {
         Class type = typeNode.getType();
 
 		return arrayAllocation( dimensionsNode, type, callstack, interpreter );
@@ -248,8 +243,7 @@ class BSHAllocationExpression extends SimpleNode
 	private Object arrayAllocation( 
 		BSHArrayDimensions dimensionsNode, Class type, 
 		CallStack callstack, Interpreter interpreter )
-		throws EvalError
-	{
+        throws EvalError, AbortException {
 		/*
 			dimensionsNode can return either a fully intialized array or VOID.
 			when VOID the prescribed array dimensions (defined and undefined)

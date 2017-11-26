@@ -63,8 +63,7 @@ class BSHFormalParameters extends SimpleNode
 	}
 
 	public String [] getTypeDescriptors( 
-		CallStack callstack, Interpreter interpreter, String defaultPackage )
-	{
+		CallStack callstack, Interpreter interpreter, String defaultPackage ) throws AbortException {
 		if ( typeDescriptors != null )
 			return typeDescriptors;
 
@@ -86,9 +85,9 @@ class BSHFormalParameters extends SimpleNode
 		Evaluate the types.  
 		Note that type resolution does not require the interpreter instance.
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter )  
-		throws EvalError
-	{
+	public Object eval( CallStack callstack, Interpreter interpreter )
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		if ( paramTypes != null )
 			return paramTypes;
 

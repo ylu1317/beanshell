@@ -46,9 +46,9 @@ class BSHForStatement extends SimpleNode implements ParserConstants
 
     BSHForStatement(int id) { super(id); }
 
-    public Object eval(CallStack callstack , Interpreter interpreter)  
-		throws EvalError
-    {
+    public Object eval(CallStack callstack , Interpreter interpreter)
+        throws EvalError, AbortException {
+        this.check_abort(this, interpreter);
         int i = 0;
         if(hasForInit)
             forInit = ((SimpleNode)jjtGetChild(i++));

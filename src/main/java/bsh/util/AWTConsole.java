@@ -314,7 +314,7 @@ public class AWTConsole extends TextArea
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String args[] ) throws AbortException {
 		AWTConsole console = new AWTConsole();
 		final Frame f = new Frame("Bsh Console");
 		f.add(console, "Center");

@@ -44,8 +44,7 @@ public class Variable implements java.io.Serializable
 	}
 	
 	Variable( String name, Object value, Modifiers modifiers )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		this( name, (Class)null/*type*/, value, modifiers );
 	}
 
@@ -55,8 +54,7 @@ public class Variable implements java.io.Serializable
 	Variable( 
 		String name, String typeDescriptor, Object value, Modifiers modifiers 
 	)
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 		this( name, (Class)null/*type*/, value, modifiers );
 		this.typeDescriptor = typeDescriptor;
 	}
@@ -65,8 +63,7 @@ public class Variable implements java.io.Serializable
 		@param value may be null if this 
 	*/
 	Variable( String name, Class type, Object value, Modifiers modifiers )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
 
 		this.name=name;
 		this.type =	type;
@@ -80,9 +77,8 @@ public class Variable implements java.io.Serializable
 		if value is null the appropriate default value will be set for the
 		type: e.g. false for boolean, zero for integer types.
 	*/
-	public void setValue( Object value, int context ) 
-		throws UtilEvalError
-	{
+	public void setValue( Object value, int context )
+		throws UtilEvalError, AbortException {
 
 		// check this.value
 		if ( hasModifier("final") && this.value != null )
@@ -113,9 +109,8 @@ public class Variable implements java.io.Serializable
 		A Variable can represent an LHS for the case of an imported class or
 		object field.
 	*/
-	Object getValue() 
-		throws UtilEvalError
-	{ 
+	Object getValue()
+		throws UtilEvalError, AbortException {
 		if ( lhs != null )
 			return type == null ?
 				lhs.getValue() : Primitive.wrap( lhs.getValue(), type );

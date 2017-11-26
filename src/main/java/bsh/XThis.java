@@ -143,8 +143,7 @@ public class XThis extends This
 		}
 
 		public Object invokeImpl( Object proxy, Method method, Object[] args )
-			throws EvalError
-		{
+			throws EvalError, AbortException {
 			String methodName = method.getName();
 			CallStack callstack = new CallStack( namespace );
 

@@ -1,5 +1,7 @@
 package bsh.engine;
 
+import bsh.AbortException;
+
 import javax.script.*;
 import java.util.List;
 import java.util.Arrays;
@@ -107,7 +109,12 @@ public class BshScriptEngineFactory implements
 
 	public ScriptEngine getScriptEngine() 
 	{
-		return new BshScriptEngine();
+		try {
+			return new BshScriptEngine();
+		} catch (AbortException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 		
 	// End impl ScriptEngineFactory

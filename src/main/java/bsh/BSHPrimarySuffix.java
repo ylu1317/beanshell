@@ -61,9 +61,9 @@ class BSHPrimarySuffix extends SimpleNode
 	*/
 	public Object doSuffix(
 		Object obj, boolean toLHS, 
-		CallStack callstack, Interpreter interpreter) 
-		throws EvalError
-	{
+		CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		// Handle ".class" suffix operation
 		// Prefix must be a BSHType
 		if ( operation == CLASS )
@@ -137,9 +137,9 @@ class BSHPrimarySuffix extends SimpleNode
 	*/
 	private Object doName(
 		Object obj, boolean toLHS, 
-		CallStack callstack, Interpreter interpreter) 
-		throws EvalError, ReflectError, InvocationTargetException
-	{
+		CallStack callstack, Interpreter interpreter)
+		throws EvalError, ReflectError, InvocationTargetException, AbortException {
+		this.check_abort(this, interpreter);
 		try {
 			// .length on array
 			if ( field.equals("length") && obj.getClass().isArray() )
@@ -202,9 +202,8 @@ class BSHPrimarySuffix extends SimpleNode
 	*/
 	static int getIndexAux(
 		Object obj, CallStack callstack, Interpreter interpreter, 
-		SimpleNode callerInfo ) 
-		throws EvalError
-	{
+		SimpleNode callerInfo )
+		throws EvalError, AbortException {
 		if ( !obj.getClass().isArray() )
 			throw new EvalError("Not an array", callerInfo, callstack );
 
@@ -233,9 +232,9 @@ class BSHPrimarySuffix extends SimpleNode
 	*/
 	private Object doIndex( 
 		Object obj, boolean toLHS, 
-		CallStack callstack, Interpreter interpreter ) 
-		throws EvalError, ReflectError
-	{
+		CallStack callstack, Interpreter interpreter )
+		throws EvalError, ReflectError, AbortException {
+		this.check_abort(this, interpreter);
 		int index = getIndexAux( obj, callstack, interpreter, this );
 		if ( toLHS )
 			return new LHS(obj, index);
@@ -252,9 +251,9 @@ class BSHPrimarySuffix extends SimpleNode
 		Must handle toLHS case.
 	*/
 	private Object doProperty( boolean toLHS,
-		Object obj, CallStack callstack, Interpreter interpreter ) 
-		throws EvalError
-	{
+		Object obj, CallStack callstack, Interpreter interpreter )
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		if(obj == Primitive.VOID)
 			throw new EvalError( 
 			"Attempt to access property on undefined variable or class name", 

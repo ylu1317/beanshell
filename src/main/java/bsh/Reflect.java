@@ -55,9 +55,8 @@ class Reflect
 	*/
     public static Object invokeObjectMethod(
 		Object object, String methodName, Object[] args, 
-		Interpreter interpreter, CallStack callstack, SimpleNode callerInfo ) 
-		throws ReflectError, EvalError, InvocationTargetException
-	{
+		Interpreter interpreter, CallStack callstack, SimpleNode callerInfo )
+		throws ReflectError, EvalError, InvocationTargetException, AbortException {
 		// Bsh scripted object
 		if ( object instanceof This && !This.isExposedThisMethod(methodName) )
 			return ((This)object).invokeMethod( 
@@ -187,8 +186,7 @@ class Reflect
 	 * If neither is found return Primitive.VOID. 
 	 */
     public static Object getObjectFieldValue( Object object, String fieldName )
-        throws UtilEvalError, ReflectError
-    {
+		throws UtilEvalError, ReflectError, AbortException {
 		if ( object instanceof This ) {
 			This t = (This)object;
 			return t.namespace.getVariableOrProperty(fieldName, null);
@@ -895,8 +893,7 @@ class Reflect
 	public static Object invokeCompiledCommand(
 		Class commandClass, Object [] args, Interpreter interpreter,
 		CallStack callstack )
-		throws UtilEvalError
-	{
+		throws UtilEvalError, AbortException {
         // add interpereter and namespace to args list
         Object[] invokeArgs = new Object[args.length + 2];
         invokeArgs[0] = interpreter;

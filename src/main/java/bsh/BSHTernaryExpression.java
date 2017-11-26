@@ -37,9 +37,9 @@ class BSHTernaryExpression extends SimpleNode {
 
     BSHTernaryExpression(int id) { super(id); }
 
-    public Object eval( CallStack callstack, Interpreter interpreter) 
-		throws EvalError
-    {
+    public Object eval( CallStack callstack, Interpreter interpreter)
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
         SimpleNode
 			cond = (SimpleNode)jjtGetChild(0),
 			evalTrue = (SimpleNode)jjtGetChild(1),

@@ -80,8 +80,8 @@ class BSHMethodDeclaration extends SimpleNode
 		@return the type or null indicating loosely typed return
 	*/
 	Class evalReturnType( CallStack callstack, Interpreter interpreter )
-		throws EvalError
-	{
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		insureNodesParsed();
 		if ( returnTypeNode != null )
 			return returnTypeNode.evalReturnType( callstack, interpreter );
@@ -90,8 +90,7 @@ class BSHMethodDeclaration extends SimpleNode
 	}
 
 	String getReturnTypeDescriptor( 
-		CallStack callstack, Interpreter interpreter, String defaultPackage )
-	{
+		CallStack callstack, Interpreter interpreter, String defaultPackage ) throws AbortException {
 		insureNodesParsed();
 		if ( returnTypeNode == null )
 			return null;
@@ -110,8 +109,8 @@ class BSHMethodDeclaration extends SimpleNode
 		structure of the method and install it into the caller's namespace.
 	*/
 	public Object eval( CallStack callstack, Interpreter interpreter )
-		throws EvalError
-	{
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		returnType = evalReturnType( callstack, interpreter );
 		evalNodes( callstack, interpreter );
 
@@ -134,9 +133,9 @@ class BSHMethodDeclaration extends SimpleNode
 		return Primitive.VOID;
 	}
 
-	private void evalNodes( CallStack callstack, Interpreter interpreter ) 
-		throws EvalError
-	{
+	private void evalNodes( CallStack callstack, Interpreter interpreter )
+		throws EvalError, AbortException {
+		this.check_abort(this, interpreter);
 		insureNodesParsed();
 		
 		// validate that the throws names are class names
